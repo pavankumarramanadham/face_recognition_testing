@@ -35,10 +35,8 @@ with app.app_context():
 datetoday = date.today().strftime("%m_%d_%y")
 datetoday2 = date.today().strftime("%d-%B-%Y")
 
-# Load dlib face detector and shape predictor
+# Load dlib face detector (No shape predictor required)
 face_detector = dlib.get_frontal_face_detector()
-face_encoder = dlib.face_recognition_model_v1("dlib_face_recognition_resnet_model_v1.dat")
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # Ensure necessary directories exist
 os.makedirs('static/faces', exist_ok=True)
@@ -147,7 +145,7 @@ def add_attendance(name):
     last_entry = Attendance.query.filter_by(roll=userid, date=datetoday).order_by(Attendance.id.desc()).first()
     if last_entry:
         last_time = datetime.strptime(last_entry.time, "%H:%M:%S")
-        if (datetime.now() - datetime.strptime(last_entry.time, "%H:%M:%S")).total_seconds() < 600:
+        if (datetime.now() - last_time).total_seconds() < 600:
             return
     
     db.session.add(Attendance(name=username, roll=userid, time=current_time, date=datetoday))
